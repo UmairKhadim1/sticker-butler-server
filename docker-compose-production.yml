@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.production  
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      MONGO_URI: mongodb+srv://admin:Fhi8ZisW4thb2Jsd@cluster0.mafgw.mongodb.net/stickerButler-Live?retryWrites=true&w=majority
+      NODE_ENV: production
+      JWT_SECRET_KEY: 33f2566729df9c07c35155f8b39635ee9c822ade77d6ffb13e0448c673bacc1f990eb7e98147124adaf0399a961dfbbc
+      CLIENT_ORIGIN: https://stickerbutler.com/
+ 
+    command: yarn run start:dev
+
+  db:
+    image: mongo
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod
+    # command: mongod --auth
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: admin
+      # MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: evergreen_dev_db
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+    volumes:
+      - mongodb:/data/db
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    ports:
+      - "27017:27017"
+ 
+
+  # webserver:
+  #   image: nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/production.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - server
+ 
+  #   command: nginx -g "daemon off";
+
+volumes:
+  mongodb:
+

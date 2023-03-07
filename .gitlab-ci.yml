@@ -1,0 +1,43 @@
+image: docker
+services:
+  - docker:dind
+stages:
+  # - test
+  - deploy
+# test:
+#     stage: test
+#     only:
+#      - main
+#      - master
+#     script:
+#      - echo run test in this section
+stage-deploy-dev:
+  stage: deploy
+  only:
+    - dev
+  script:
+    - docker-compose -f "docker-compose-development.yml" down
+    - sudo docker image prune -f
+    - docker-compose -f "docker-compose-development.yml" up  -d --build
+
+stage-deploy-stag:
+  stage: deploy
+  only:
+    - staging
+  script:
+    - sudo ssh -i /home/gitlab-runner/.ssh/staging root@192.241.137.53 "sudo rm -r /home/email-buttler-server/"
+    - sudo ssh -i /home/gitlab-runner/.ssh/staging root@192.241.137.53 "mkdir -p /home/email-buttler-server/"
+    - sudo scp -i /home/gitlab-runner/.ssh/staging -r  ${CI_PROJECT_DIR}/  root@192.241.137.53:/home/
+    - sudo ssh -i /home/gitlab-runner/.ssh/staging root@192.241.137.53    "docker-compose -f "/home/email-buttler-server/docker-compose-staging.yml" down | docker-compose -f "/home/email-buttler-server/docker-compose-staging.yml" up  -d --build  "
+
+stage-deploy-prod:
+  stage: deploy
+  only:
+    - production
+  script:
+    - sudo ssh -o StrictHostKeyChecking=no -i /home/gitlab-runner/.ssh/staging root@68.183.30.186 "sudo rm -r /home/email-buttler-server/"
+    - sudo ssh -o StrictHostKeyChecking=no -i /home/gitlab-runner/.ssh/staging root@68.183.30.186 "mkdir -p /home/email-buttler-server/"
+    - sudo scp -i /home/gitlab-runner/.ssh/staging -r  ${CI_PROJECT_DIR}/  root@68.183.30.186:/home/
+    - sudo ssh -o StrictHostKeyChecking=no -i /home/gitlab-runner/.ssh/staging root@68.183.30.186 "docker-compose -f "/home/email-buttler-server/docker-compose-production.yml" down | docker-compose -f "/home/email-buttler-server/docker-compose-production.yml" up  -d --build  "
+  # environment: development
+  # when: manual

@@ -1,0 +1,24 @@
+users:
+  - name: fb-anna
+    _id: fb-anna
+    email: anna@buttler.com
+    password: anna
+    addressBook: []
+    isSuspended: false
+    confirmPassword: anna
+
+  - name: fb-bob
+    _id: fb-bob
+    email: bob@buttler.com
+    password: bob
+    addressBook: []
+    isSuspended: false
+    confirmPassword: bob
+
+  - name: fb-calum
+    _id: fb-calum
+    email: calum@buttler.com
+    password: calum
+    addressBook: []
+    isSuspended: false
+    confirmPassword: calum
